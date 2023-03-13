@@ -1,0 +1,71 @@
+Today we're going to look at how you can take speech and turn it into text using AI.
+And the really crazy thing is that it does a better job than most humans.
+You can use it with English and 96 other languages.
+It works even if you have a lot of background noise.
+And it also works if you have a deadly sick accent.
+The best part is that it's completely free and also open source.
+Let's check out how to do this.
+We're going to use an AI tool called Whisper.
+Whisper is made by a company called OpenAI.
+And you might have heard of them before.
+That's the same company behind the immensely popular ChatGPT, which allows you to converse with a computer.
+There are also the company behind Dolly2, where you can type in some text and then it'll generate an image based on that text.
+You can install Whisper directly on your computer.
+You can click on the link right up above.
+But you do need a somewhat capable computer.
+So instead, we're going to use something called Google Collaboratory.
+This allows you to run code directly in your web browser.
+So it doesn't really matter what type of PC you have.
+To use Google Collaboratory, head to Google Drive.
+You can click on the link right up above.
+You'll need a Google account.
+And if you don't have one yet, it's entirely free to set up.
+On Google Drive, in the top left-hand corner, let's click on the New button.
+And at the very bottom, let's click on More.
+And then go down to Connect More Apps.
+At the top of this dialog, let's click into the search field.
+And here, type in Google Collaboratory and then Search.
+Here, we see this result for Collaboratory.
+Let's click on that.
+And here, let's click on Install.
+Next, let's click on Continue.
+Next, you should see a message saying that Google Collaboratory was connected to Google Drive.
+Let's click on OK.
+And look at that. It has successfully been installed.
+Let's click on Done.
+Now, you can close out this window.
+Let's now go back to the top left-hand corner.
+Click on the New button again.
+Then go down to More.
+And here, you should now see an option for Google Collaboratory.
+Let's click on this one.
+This drops us into the Google Collaboratory space.
+And at first glance, it might look a little bit intimidating.
+But trust me, this is going to be so easy.
+And the results are going to be so good.
+In the top left-hand corner, first off, let's give our file a name.
+This way, you can find your way back to this in the future.
+I'll click on Untitled.
+Let's double-click on that.
+And here, I'll type in Transcribe Audio.
+Here, I'll click away. And that's now the name of the file.
+Next, let's click on the menu titled Runtime.
+And right here, there's the option for Change Runtime Type.
+Let's click on that code.
+And here, I'll enter this in.
+You'll find this in the description, so you can simply copy and paste it from there.
+First, we're going to install Whisper.
+And we're getting this from GitHub.
+This is where all of the code is kept and also maintained.
+Once we get that, we're going to install something called FFmpeg.
+And this allows us to work with audio and video files.
+And although I say we're going to install it, don't worry.
+We're not installing anything on your computer.
+This is installing it all to the Google Collaboratory.
+Once you're all set, over on the left-hand side, let's click on this Run icon.
+This will now go through and install Whisper and also FFmpeg.
+And it looks like the installation finished in about 23 seconds.
+Not too bad.
+Over on the left-hand side, let's click on this folder icon.
+And you can now drag in an audio file or a video file that you would like to transcribe.
+Here, I have an MP3 file, and I'll simply drop this in.

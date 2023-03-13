@@ -1,0 +1,391 @@
+---
+title: "03-Limpieza-y-Manipulacion-de-Datos.Rmd"
+output: html_document
+date: "2023-03-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Limpieza-y-Manipulacion-de-Datos
+
+
+En estas notas abordaremos los temas de limpieza y manipulación de datos utilizando el paquete `tidyverse` de R. Trataremos los siguientes puntos:
+
+* Los principios de datos limpios.
+* Aspectos básicos de manipulación de datos.
+* Reestructuración de bases de datos.
+* Estrategia divide-aplica-combina.
+
+
+
+
+### Datos Limpios
+Una vez que importamos datos a R es conveniente limpiarlos, esto implica  almacenarlos de una manera consisistente que nos permita
+enfocarnos en responder preguntas con los datos en lugar de estar luchando  con los datos. Entonces, **datos limpios** son datos que facilitan las tareas del 
+análisis de datos: 
+
+* **Manipulación:** Manipulación de variables como agregar, filtrar, reordenar, transformar. 
+
+* **Visualización:** Resúmenes de datos usando gráficas, análisis exploratorio, o presentación de resultados. 
+
+* **Modelación:** Ajustar modelos es sencillo si los datos están en la forma correcta.
+
+
+
+### Unidad Observacional
+Los principios de **datos limpios** ([Tidy Data de Hadley Wickham](http://vita.had.co.nz/papers/tidy-data.pdf)) proveen una manera 
+estándar de organizar la información.
+
+Para enunciarlos, es necesario introducir el concepto de Unidad Observacional. Una **Unidad Observacional** (o Unidad de Observación) es la entidad mayor, primaria o representativa de lo que va a ser objeto específico de estudio en una medición y se refiere al qué o quién es objeto de interés en una investigación. A este objeto de estudio le medimos ciertas características. Una unidad observacional tiene las siguientes propiedades: 
+
+* Una unidad observacional en una tabla puede estar definida por una o más variables. 
+* El resto de las variables de la tabla corresponden a las características de la unidad observacional.
+
+
+Los principios de datos limpios son:
+
+1. Cada variable forma una columna.
+2. Cada tipo de unidad observacional forma una tabla.
+3. Cada valor de la unidad observacional forma un renglón.
+
+
+
+Los principios de datos limpios son:
+
+1. Cada variable forma una columna.
+2. Cada tipo de unidad observacional forma una tabla.
+3. Cada valor de la unidad observacional forma un renglón.
+
+
+Vale la pena notar que los principios de datos limpios se pueden ver como teoría de algebra relacional para estadísticos; estos principios equivalen a la tercera forma normal de Codd con enfoque en una sola tabla de datos en lugar de muchas conectadas en bases de datos relacionales. 
+
+La mayor parte de las bases de datos en estadística tienen forma de tabla rectangular, es decir, están constituidas por datos representados de manera tabular. En el presente curso consideraremos únicamente datos con esta estructura.
+
+**Ejemplo:** Considere la siguiente tabla que representa a 3 individuos expuestos a uno o dos tipos de tratamientos (denotados A y B) y en la que se muestra el resultado del tratamiento correspondiente.
+
+
+||tratamientoA|tratamientoB
+----|------------|---------
+Juan Aguirre|- |2
+Ana Bernal  |16|11
+José López  |3 |1
+
+¿Cuántas variables tiene la tabla? La respuesta más sencilla es 3 variables: nombre, tipo de tratamiento y resultado del tratamiento.
+
+La tabla anterior también se puede reestructurar de la siguiente manera:
+
+
+ ||Juan Aguirre| Ana Bernal|José López
+--|------------|-----------|----------
+tratamientoA|- |    16     |   3
+tratamientoB|2 |    11     |   1
+
+
+
+¿Cumplen las tablas anteriores los principios de datos limpios? La respuesta depende del número de variables y de la definición de unidad observacional.
+
+En este caso, independientemente de la definición de unidad observacional, es claro que la respuesta es NO, ya que ambas tablas violan el principio número 1.
+
+Reestructurando la tabla, obtenemos una nueva tabla que cumple con el principio número 1 de datos limpios: 
+
+nombre|tipo de tratamiento|resultado del tratamiento
+------------|-----|---------
+Juan Aguirre|a    |-
+Ana Bernal  |a    |16
+José López  |a    |3
+Juan Aguirre|b    |2
+Ana Bernal  |b    |11
+José López  |b    |1
+
+
+¿Esta tabla cumple con los principios de datos limpios? Por construcción cumple con el principio número 1. Sin embargo, los principios 2 y 3 dependen de la definición de unidad observacional. En este caso, si la unidad observacional está definida por las variables nombre y tipo de tratamiento, es claro que la tabla cumple con los principios de datos limpios. Sin embargo, una definición diferente de unidad observacional podría implicar que la tabla no cumple con dichos principios.
+
+**Ejercicio:** Define una unidad observacional para el ejemplo anterior tal que la última tabla no cumpla con el principio de datos limpios. Reestructura la tabla en una nueva tabla que sí cumpla con los principios de datos limpios.
+
+
+
+### Aspectos básicos de manipulación de datos
+Para abordar el tema de Limpieza de Datos, es necesario familiarizarse con aspectos básicos de manipulación de datos. Ilustraremos estos aspectos utilizando funciones que se encuentran en el paquete `tidyverse`. Más adelante regresaremos de lleno al tema de Manipulación de Datos cuando veamos la Estategia divide-aplica-combina.
+
+
+```{r}
+library(tidyverse)
+
+
+```
+
+
+Un _tibble_ es un Data Frame en R adaptado al  paquete `tidyverse` mediante el paquete `tibble`. Creamos un tibble utilizando la función con el mismo nombre:
+
+```{r}
+df_ej <- tibble(genero = c("mujer", "hombre", "mujer", "mujer", "hombre"), 
+                estatura = c(1.65, 1.80, 1.70, 1.60, 1.67))
+df_ej
+str(df_ej)
+```
+
+En específico, estudiaremos las funciones del paquete `dplyr` que es parte del paquete `tidyverse` para manipular _datos limpios_: filtrar, seleccionar, arreglar, mutar y realizar sumarizados. El objeto de entrada de todas estas funciones es un `tibble` y el objeto de salida es también un `tibble`.
+
+#### Filtrar datos de "una tabla <tibble> en R"
+Obtiene un subconjunto de las filas de acuerdo a un criterio:
+```{r}
+filter(df_ej, genero == "mujer")
+filter(df_ej, estatura > 1.65 & estatura < 1.75)
+```
+
+#### Seleccionar columnas de una tibble en R de acuerdo al nombre  
+Selecciona columnas de acuerdo al nombre:
+```{r}
+df_ej
+select(df_ej, genero)
+select(df_ej, -genero) #Elige todas las columnas excepto la llamada "genero"
+select(df_ej, starts_with("g")) #Nombre empieza con la letra "g"
+select(df_ej, contains("g")) #Nombre contiene la letra "g"
+```
+
+#### Arreglar /ordenar a los registros de una tibble alfabética o númericamente en R  
+Reordena las filas:
+```{r}
+arrange(df_ej, genero) #Orden alfabético
+arrange(df_ej, desc(estatura)) #Orden numérico descendente
+```
+
+#### Mutar datos de una tibble en R 
+Crea y agrega nuevas variables:
+```{r}
+mutate(df_ej, estatura_cm = estatura * 100) 
+mutate(df_ej, estatura_cm = estatura * 100, estatura_in = estatura_cm * 0.3937) 
+```
+
+
+#### Sumarizados
+Crea nuevas bases de datos con resúmenes o agregaciones de los datos originales:
+```{r}
+summarise(df_ej, promedio = mean(estatura))
+```
+Podemos hacer resúmenes por grupo. Para ello primero creamos una base de datos con información de _agrupación_ con respecto a la variable género (nota que la tabla no cambió, únicamente le agregamos el atributo `grupo`):
+```{r}
+by_genero <- group_by(df_ej, genero)
+by_genero
+```
+Después operamos sobre cada grupo, creando un resumen a nivel grupo:
+```{r}
+summarise(by_genero, promedio = mean(estatura))
+```
+
+#### Estableciendo el Directorio de Trabajo (_Working Directory_ (WD))
+Cuando cargamos archivo, R siempre los llama desde el Directorio de Trabajo. Para consultar cuál es el Directorio de Trabajo actual de nuestra sesión en R utilizamos el comando: 
+```{r}
+getwd() #Directorio de Trabajo actual
+```
+Si deseamos cambiar el Directorio de Trabajo, especificamos el nuevo folder mediante el comando:
+```{r}
+#setwd("C:/Users/lberdicha/Documents/ITAM/Cursos 2017/Otono 2017/Estadistica Computacional/Modulo 2")   #Change WD
+getwd() 
+```
+Para obtener una lista de los archivos que se encuentran en el Directorio de Trabajo:
+```{r}
+dir() #Lista de archivos en el WD
+```
+
+
+## Limpieza y Reestructuración de Bases de Datos (Un ejemplo en R)
+
+Los principios de datos limpios parecen obvios pero la mayor parte de las bases de datos no los cumplen debido a que:
+
+1. La mayor parte de la gente no está familiarizada con los principios y es difícil derivarlos por uno mismo.  
+2. Los datos suelen estar organizados para facilitar otros aspectos que no son el análisis de datos; por ejemplo, la captura de los datos.  
+
+Algunos de los problemas más comunes en las bases de datos que no están _limpias_ son:
+
+1. Los encabezados de las columnas son valores de otra variable. 
+2. Más de una variable por columna. 
+3. Las variables están organizadas tanto en filas como en columnas. 
+4. Más de un tipo de unidad observacional en una tabla.
+5. Una misma unidad observacional está almacenada en múltiples tablas. 
+
+La mayor parte de estos problemas se pueden arreglar con pocas herramientas; 
+a continuación veremos como _limpiar_ datos usando 2 funciones del paquete `tidyr`:
+
+* `gather`: recibe múltiples columnas y las junta en pares de valores y nombres, esto es, convierte los datos _anchos_ en _largos_.  
+* `spread`: recibe 1 columnas y las separa en 2 o más columnas, haciendo los datos más anchos.
+
+Repasaremos los problemas más comunes que se encuentran en conjuntos de datossucios y mostraremos como se puede manipular la tabla de datos (usando las funciones *gather* y *spread*) con el fin de estructurarla para que cumpla los
+principios de datos limpios.
+
+#### 1. Los encabezados de las columanas son valores de otra variable.
+Usaremos ejemplos para entender los conceptos más facilmente.
+
+##### Ejemplo 1: 
+
+La primer base de datos está basada en una encuesta de [Pew Research](http://www.pewforum.org/2009/01/30/income-distribution-within-us-religious-groups/) que investiga la relación entre ingreso y afiliación religiosa.
+
+Cargamos la base de datos de una URL:
+
+```{r}
+library(tidyverse)
+pew <- read_delim("http://stat405.had.co.nz/data/pew.txt", "\t", 
+  escape_double = FALSE, trim_ws = TRUE)
+head(pew)
+```
+
+¿Cuáles son las variables en estos datos? Esta base de datos tiene 3 variables: religión, ingreso y frecuencia. 
+
+Para _limpiarla_ es necesario apilar las columnas (_alargar_ los datos). Notemos
+que al alargar los datos desapareceran las columnas que se agrupan y dan lugar a
+dos nuveas columnas: la correspondiente a clave y la correspondiente a valor.
+Para alargar una base de datos usamos la función `gather` que recibe 
+los argumentos:
+
+* data: base de datos que vamos a reestructurar.  
+* key: nombre de la nueva variable que contiene como valores los nombres
+de las columnas que vamos a apilar.  
+* value: nombre de la variable que almacenará los valores que corresponden a 
+cada *key*.  
+* ...: lo último que especificamos son las columnas que vamos a apilar, la notación para seleccionarlas es la misma que usamos con `select()`.
+
+
+```{r}
+pew_tidy <- gather(data = pew, income, frequency, -religion) #En este caso indicamos la columna que NO vamos a apilar
+head(pew_tidy)
+str(pew_tidy)
+```
+Observemos que en la tabla _ancha_ teníamos bajo la columna *<$10k*, en el renglón
+correspondiente a *Agnostic* un valor de 27, y podemos ver que este valor en 
+la tabla _larga_ se almacena bajo la columna frecuencia y corresponde a los valores *Agnostic* de religión, y *<$10k* de income. También es importante ver que en este ejemplo especificamos las columnas a apilar identificando la que NO vamos a alargar
+con un signo negativo: es decir apila todas las columnas menos religión.
+
+La nueva estructura de la base de datos nos permite, por ejemplo, hacer 
+fácilmente una gráfica donde podemos comparar las diferencias en las 
+frecuencias. 
+
+Nota: En esta sección no explicaremos las funciones para graficar pues estas 
+se cubren en las notas de Visualización en R. En esta parte nos concentramos
+en cómo limpiar datos y ejemplificar lo sencillo que es trabajar con datos 
+limpios, esto es, una vez que los datos fueron reestructurados e tal forma que cumplan con el principio de datos limpios es fácil construir gráficas y resúmenes estadísticos.
+
+
+```{r, fig.height = 5.8, fig.width = 6.8, warning = FALSE}
+ggplot(pew_tidy, aes(x = income, y = frequency, color = religion, group = religion)) +
+  geom_line() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+Podemos hacer gráficas más interesantes si creamos nuevas variables:
+
+```{r, fig.height = 4, fig.width = 7.7}
+by_religion <- group_by(pew_tidy, religion)
+pew_tidy_2 <- pew_tidy %>%
+  filter(income != "Don't know/refused") %>%
+  group_by(religion) %>%
+  mutate(percent = frequency / sum(frequency)) %>% 
+  filter(sum(frequency) > 1000)
+head(pew_tidy_2)
+ggplot(pew_tidy_2, aes(x = income, y = percent, group = religion)) +
+  facet_wrap(~ religion, nrow = 1) +
+  geom_bar(stat = "identity", fill = "darkgray") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Veamos los datos de la tabla `Billboard`, aquí se registra la fecha en la 
+que una canción entra por primera vez al top 100 de Billboard.
+
+Cargamos la base de datos de un documento en formato .csv (comma separated values) de nuestro equipo:
+
+```{r}
+billboard <- read_csv("https://raw.githubusercontent.com/hadley/tidy-data/master/data/billboard.csv")
+head(billboard)
+#str(billboard)
+```
+
+Notemos que el rank en cada semana (una vez que entró en la lista) está guardado
+en 75 columnas `wk1` a `wk75`, este tipo de almacenamiento no es *limpio* ya que los encabezados corresponden a los valores de la variable semana, pero 
+puede ser útil al momento de ingresar la información.
+
+Para tener datos *limpios* apilamos las semanas de manera que sea una sola 
+columna (nuevamente _alargamos_ los datos):
+
+
+```{r}
+billboard_long <- gather(billboard, week, rank, x1st.week:x76th.week, na.rm = TRUE) #Eliminamos valores faltantes de la variable rank
+head(billboard_long)
+tail(billboard_long)
+str(billboard_long)
+```
+
+Notemos que en esta ocasión especificamos las columnas que vamos a apilarindicando el nombre de la primera de ellas seguido de `:` y por último el nombre de la última variable a apilar. Por otra parte, la instrucción 
+`na.rm = TRUE` se utiliza para eliminar los renglones con valores faltantes en 
+la columna de value (rank), esto es, eliminamos aquellas observaciones que 
+tenían NA en la columnas wk*num* de la tabla _ancha_. Ahora realizamos unalimpieza adicional creando mejores variables de fecha.
+
+```{r}
+billboard_tidy <- billboard_long %>%
+  mutate(
+    week = parse_number(week),
+    date = date.entered + 7 * (week - 1), 
+    rank = as.numeric(rank)
+    ) %>%
+    select(-date.entered)
+head(billboard_tidy)
+```
+
+
+```{r, fig.height = 4, fig.width = 7.7}
+tracks <- filter(billboard_tidy, track %in% 
+    c("Higher", "Amazed", "Kryptonite", "Breathe", "With Arms Wide Open"))
+ggplot(tracks, aes(x = date, y = rank)) +
+  geom_line() + 
+  facet_wrap(~track, nrow = 1) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+```{r}
+tb <- read.csv("tb.csv") #Notar que utilizamos la función read.csv en lugar de read_csv
+head(tb)
+str(tb)
+```
+
+**Ejercicio:** De manera similar a los ejemplos anteriores, 
+utiliza la función `gather` para apilar las columnas correspondientes a 
+género-edad. 
+
+
+
+```{r, echo=FALSE, results=FALSE}
+tb_long <- gather(tb, demo, n, -iso2, -year, na.rm = TRUE)
+head(tb_long)
+str(tb_long)
+```
+
+Notemos que las variables género y edad se encuentran almacenadas en una sola variable: demo. Para reestructurar la base de datos en una base de datos limpia debemos separar en dos columnas la variable demo, una para almacenar la variable género y otra para la variable edad. Para ello utilizaremos la función `separate()`, esta recibe como parámetros:  
+
+* el nombre de la base de datos,  
+
+* el nombre de la variable que deseamos separar en más de una,  
+
+* la posición de donde deseamos "cortar" (hay más opciones para especificar 
+como separar, ver `?separate`). El default es separar valores en todos los lugares que encuentre un caracter que no es alfanumérico (espacio, guión,...).
+
+
+```{r}
+tb_tidy <- separate(tb_long, demo, c("sex", "age"), 8)
+head(tb_tidy)
+table(tb_tidy$sex) #Frecuencias de las clases de la variable sex
+```
+
+Creamos una mejor codificación de la variable género:
+```{r}
+tb_tidy <- mutate(tb_tidy, sex = substr(sex, 8, 8))
+head(tb_tidy)
+table(tb_tidy$sex)
+```
+
+
+```{r}
+
+```
+
+
+
